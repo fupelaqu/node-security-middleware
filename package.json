@@ -1,0 +1,28 @@
+{
+  "author": {
+    "name": "Stephane Manciot",
+    "email": "stephane.manciot@gmail.com"
+  },
+  "name": "security-middleware",
+  "description": "security middleware for connect.",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fupelaqu/node-security-middleware.git"
+  },
+  "main": "./lib/middleware.js",
+  "dependencies": {
+    "connect": "2.4.x"
+  },
+  "devDependencies": {
+    "express": "3.0.x",
+    "ejs": "0.8.x",
+    "less-middleware": "0.1.x"
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": "0.8.x"
+  },
+  "_id": "security-middleware@0.0.1",
+  "_from": "security-middleware@*"
+}
