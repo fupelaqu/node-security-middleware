@@ -66,12 +66,19 @@ assert.equal(realm.hasRole(account.principal, 'dummy'), false);
 assert.ok(realm.hasAllRoles(account.principal, ['admin', 'user']));
 assert.equal(realm.hasAllRoles(account.principal, ['admin', 'user', 'dummy']), false);
 
-var acs = [{
-    url : '/admin',
-    methods : 'GET, POST',
-    authentication : 'BASIC',
-    rules : '(([role=dummy] && [permission=admin:dummy]) || [role=admin])'
-}];
+var acs = [
+    {
+        url : '/admin',
+        methods : 'GET, POST',
+        authentication : 'BASIC',
+        rules : '(([role=user] && [permission=admin]) || [role=admin])'
+    },
+    {
+        url : '/products',
+        methods : 'GET, POST',
+        authentication : 'FORM',
+        rules : '(([role=user] && [permission=products:{idProduct}]) || [role=admin])'
+    }];
 
 var acl = new security.AccessControlList();
 utils.forEach(acs, function(accessControl){
@@ -92,3 +99,9 @@ subject.login(token);
 var accessControl = acl.lookup(req);
 assert.ok(utils.isDefined(accessControl));
 assert.ok(accessControl.check(req));
+
+req['url'] = '/products?idProduct=1';
+accessControl = acl.lookup(req);
+assert.ok(utils.isDefined(accessControl));
+assert.ok(accessControl.check(req));
+

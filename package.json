@@ -4,13 +4,16 @@
     "email": "stephane.manciot@gmail.com"
   },
   "name": "security-middleware",
-  "description": "security middleware for connect.",
-  "version": "0.0.1",
+  "description": "security middleware for connect/express.",
+  "version": "0.0.2rc1",
   "repository": {
     "type": "git",
     "url": "git://github.com/fupelaqu/node-security-middleware.git"
   },
   "main": "./lib/middleware.js",
+  "scripts":{
+    "test":"node ./test/*"
+  },
   "dependencies": {
     "connect": "2.4.x"
   },

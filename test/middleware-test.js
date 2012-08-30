@@ -63,22 +63,21 @@ app.configure(function(){
         secure : true,
         credentialsMatcher: sha256CredentialsMatcher,
         loginUrl : '/login',
-        logoutUrl : '/logout',
-        loginPage : 'login',
         usernameParam : 'username',
         passwordParam : 'password',
+        logoutUrl : '/logout',
         acl : [
         {
             url : '/admin',
             methods : 'GET, POST',
             authentication : 'BASIC',
-            roles : 'admin'
+            rules : '(([role=dummy] && [permission=admin:dummy]) || [role=admin])'
         },
         {
             url : '/products',
             methods : 'GET, POST',
             authentication : 'FORM',
-            roles : 'user'
+            rules : '(([role=dummy] && [permission=products:{idProduct}]) || [role=admin])'
         }
         ]
     }));
