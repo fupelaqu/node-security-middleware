@@ -7,40 +7,48 @@ var express = require('express')
 , routes = require('./routes')
 , http = require('http')
 , path = require('path')
-, assert = require('assert')
-, sha256CredentialsMatcher = require('../lib/security.js').sha256CredentialsMatcher
+, MemoryStore = require('connect/lib/middleware/session/memory')
+
 , utils = require('../lib/utils.js')
-, security = require('../lib/middleware.js');
+, credentialsMatcher = require('../lib/security.js').sha256CredentialsMatcher
+, store = require('../lib/security.js').inMemoryStore
+
+, security = require('../lib/middleware.js')
+
+, userRolePrivileges = []
+, adminRolePrivileges = [ 'admin:*' ]
+, userRoles = [ 'user' ]
+, userPrivileges = [ 'products:company_1:list', 'products:company_1:show:*' ]
+, adminRoles = [ 'user', 'admin' ]
+, adminPrivileges = []
+, encryptedPassword = credentialsMatcher.encrypt('changeit');
+
+// init inMemoryStore
+store.storeRole({
+    name : 'user',
+    privileges : userRolePrivileges
+});
+
+store.storeRole({
+    name : 'admin',
+    privileges : adminRolePrivileges
+});
+
+store.storeAccount({
+    username : 'user',
+    password : encryptedPassword,
+    roles : userRoles,
+    privileges : userPrivileges
+});
+
+store.storeAccount({
+    username : 'admin',
+    password : encryptedPassword,
+    roles : adminRoles,
+    privileges : adminPrivileges
+});
 
 var app = express();
-
-var store = require('../lib/security.js').inMemoryStore;
-store.storeAccount({
-    username : 'user', 
-    password : sha256CredentialsMatcher.encrypt('changeit'),
-    roles: ['user'],
-    privileges : []
-});
-store.storeAccount({
-    username : 'admin', 
-    password : sha256CredentialsMatcher.encrypt('changeit'),
-    roles: ['user', 'admin'],
-    privileges : []
-});
-store.storeRole({
-    name : 'user', 
-    privileges : []
-});
-store.storeRole({
-    name : 'admin', 
-    privileges : ['*']
-});
-
-console.log(store);
-
-var secret = 'your secret here';
-
-var MemoryStore = require('connect/lib/middleware/session/memory');
 
 app.configure(function(){
     app.set('port', 3000);
@@ -48,7 +56,7 @@ app.configure(function(){
     app.set('view engine', 'ejs');
     app.use(express.bodyParser());
     app.use(express.methodOverride());
-    app.use(express.cookieParser(secret));
+    app.use(express.cookieParser('secret'));
     app.use(express.session({
         store: new MemoryStore({
             reapInterval: 60000 * 10
@@ -56,29 +64,53 @@ app.configure(function(){
     }));
 
     app.use(security({ 
-        debug : true,
-        realm : 'Express-security',
+        debug : false,
+        realmName : 'Express-security',
         store : store,
         rememberMe : true,
         secure : true,
-        credentialsMatcher: sha256CredentialsMatcher,
+        credentialsMatcher: 'sha256', // credentialsMatcher
         loginUrl : '/login',
         usernameParam : 'username',
         passwordParam : 'password',
         logoutUrl : '/logout',
         acl : [
-        {
-            url : '/admin',
-            methods : 'GET, POST',
-            authentication : 'BASIC',
-            rules : '(([role=dummy] && [permission=admin:dummy]) || [role=admin])'
-        },
-        {
-            url : '/products',
-            methods : 'GET, POST',
-            authentication : 'FORM',
-            rules : '(([role=dummy] && [permission=products:{idProduct}]) || [role=admin])'
-        }
+               {
+                   url : '/admin',
+                   methods : 'GET, POST',
+                   authentication : 'BASIC',
+                   rules : '(([role=user] && [permission=admin]) || [role=admin])'
+               },
+               {
+                   url : '/products/list',
+                   methods : 'GET',
+                   authentication : 'FORM',
+                   rules : '(([role=user] && [permission=products:company_{idCompany}:list]) || [role=admin])'
+               },
+               {
+                   url : '/products',
+                   methods : 'GET',
+                   authentication : 'FORM',
+                   rules : '(([role=user] && [permission=products:company_{idCompany}:show:product_{idProduct}]) || [role=admin])'
+               },
+               {
+                   url : '/products',
+                   methods : 'PUT',
+                   authentication : 'FORM',
+                   rules : '(([role=user] && [permission=products:company_{idCompany}:create]) || [role=admin])'
+               },
+               {
+                   url : '/products',
+                   methods : 'POST',
+                   authentication : 'FORM',
+                   rules : '(([role=user] && [permission=products:company_{idCompany}:update]) || [role=admin])'
+               },
+               {
+                   url : '/products',
+                   methods : 'DELETE',
+                   authentication : 'FORM',
+                   rules : '(([role=user] && [permission=products:company_{idCompany}:delete]) || [role=admin])'
+               }
         ]
     }));
 
@@ -112,122 +144,84 @@ var retrieveCookies = function(response){
     return cookies.join(';');
 };
 
-var options = {
-    host : 'localhost',
-    port : app.get('port'),
-    method : 'GET'
+var cookies = null;
+
+exports['test middleware#BASIC-AUTH'] = function(beforeExit, assert) {
+    // test without authentication
+    assert.response(server, {
+        url: '/admin',
+        method: 'GET'
+    }, {
+        status: 401
+    }, 'test middleware#BASIC-AUTH without authentication');
+    // test with bad principal
+    assert.response(server, {
+        url: '/admin',
+        method: 'GET',
+        headers : {
+            'Authorization': 'Basic ' + new Buffer('wrong:wrong').toString('base64')
+        }
+    }, {
+        status: 401
+    }, 'test middleware#BASIC-AUTH with bad principal');
+    // test with wrong password
+    assert.response(server, {
+        url: '/admin',
+        method: 'GET',
+        headers : {
+            'Authorization': 'Basic ' + new Buffer('admin:wrong').toString('base64')
+        }
+    }, {
+        status: 401
+    }, 'test middleware#BASIC-AUTH with wrong password');
+    // test OK
+    assert.response(server, {
+        url: '/admin',
+        method: 'GET',
+        headers : {
+            'Authorization': 'Basic ' + new Buffer('admin:changeit').toString('base64')
+        }
+    }, {
+        status: 200,
+    }, function(response){
+        cookies = retrieveCookies(response);
+        assert.ok(cookies.indexOf('account') >= 0);
+    }, 'test middleware#BASIC-AUTH OK');
 };
 
-var testRequests = function(requests){
-    if(requests.length > 0){
-        var request = requests[0];
-        utils.copy(options, request.options);
-        var req = http.request(options, function (response) {
-            var responseCode = response.statusCode;
-            console.log('STATUS: ' + responseCode);
-            console.log('ASSERT: ' + request.code);
-            assert.ok(utils.isEqual(request.code, responseCode));
-            console.log('HEADERS: ' + JSON.stringify(response.headers));
-            var headers = options['headers'] || {};
-            headers['Cookie'] = retrieveCookies(response);
-            options['headers'] = headers;
-            requests.splice(0, 1);
-            testRequests(requests);
-        });
-        req.on('error', function(e) {
-            console.log('problem with request: ' + e.message);
-            server.close(function(){
-                console.log("Express server stop listening on port " + app.get('port'));
-            });
-        });
-        req.end();
-    }
-    else{
-        server.close(function(){
-            console.log("Express server stop listening on port " + app.get('port'));
-        });
-    }
-}
-
-var requests = [];
-
-/**
- * CHECK BASIC AUTHENTICATION
- */
-
-// test without authentication
-requests.push({
-    options:{
-        path: '/admin'
-    }, 
-    code:401
-});
-
-// test with bad principal
-requests.push({
-    options:{
-        auth: 'wrong:wrong'
-    }, 
-    code:401
-});
-
-// test with wrong password
-requests.push({
-    options:{
-        auth: 'admin:wrong'
-    }, 
-    code:401
-});
-
-// test OK
-requests.push({
-    options:{
-        auth: 'admin:changeit'
-    }, 
-    code:200
-});
-
-/**
- * CHECK FORM AUTHENTICATION
- */
-
-requests.push({
-    options:{
-        path: '/logout'
-    }, 
-    code:302
-});
-
-// test without authentication
-requests.push({
-    options:{
-        path: '/products'
-    }, 
-    code:302
-});
-
-// test with bad username
-requests.push({
-    options:{
-        path: '/login?username=wrong&password=wrong'
-    }, 
-    code:302
-});
-
-// test with bad password
-requests.push({
-    options:{
-        path: '/login?username=admin&password=wrong'
-    }, 
-    code:302
-});
-
-// test OK
-requests.push({
-    options:{
-        path: '/login?username=admin&password=changeit'
-    }, 
-    code:200
-});
-
-testRequests(requests);
+exports['test middleware#FORM-AUTH'] = function(beforeExit, assert) {
+    assert.response(server, {
+        url: '/logout',
+        method: 'GET'
+    }, {
+        status: 302
+    });
+    // test without authentication
+    assert.response(server, {
+        url: '/products',
+        method: 'GET'
+    }, {
+        status: 302
+    }, 'test without authentication');
+    // test with bad username
+    assert.response(server, {
+        url: '/login?username=wrong&password=wrong',
+        method: 'GET'
+    }, {
+        status: 302
+    }, 'test FORM-AUTH with bad username');
+    // test with bad password
+    assert.response(server, {
+        url: '/login?username=admin&password=wrong',
+        method: 'GET'
+    }, {
+        status: 302
+    },'test FORM-AUTH with bad password');
+    // test ok
+    assert.response(server, {
+        url: '/login?username=admin&password=changeit',
+        method: 'GET'
+    }, {
+        status: 200
+    }, 'test FORM-AUTH OK');
+};
