@@ -24,6 +24,7 @@ Using It
     var app = express();
 
     app.configure(function(){
+    ...
       app.use(security({ 
         debug : false, // for debug purpose
         realmName : 'Express-security', // realm name
@@ -74,4 +75,5 @@ Using It
                }
         ]
       }));
+      ...
     });
