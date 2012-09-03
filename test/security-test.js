@@ -185,7 +185,7 @@ exports['test security.AccessControlList'] = function(beforeExit, assert) {
         cookies : []
     };
 
-    var subject = new security.Subject(realm, req, false);
+    var subject = new security.Subject(realm, req, null, false);
     req.subject = subject;
     subject.login(token);
 
@@ -230,7 +230,7 @@ exports['test security.AccessControlList'] = function(beforeExit, assert) {
         signedCookies : [],
         cookies : []
     };
-    subject = new security.Subject(realm, req, false);
+    subject = new security.Subject(realm, req, null, false);
     req.subject = subject;
     subject.login(new security.UsernamePasswordToken('user', 'changeit'));
 
