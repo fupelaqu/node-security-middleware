@@ -5,3 +5,8 @@ node-security-middleware
 
 node-security-middleware is a security middleware for [Connect](http://senchalabs.github.com/connect/)/[Node.js](http://nodejs.org)
 
+Installation
+====================
+
+    $ npm install security-middleware
+    
