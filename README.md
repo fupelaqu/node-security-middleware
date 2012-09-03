@@ -17,7 +17,7 @@ Installation
 Using It
 ====================
 
-### Configure the middleware within express
+### Configure security-middleware within express
 
     var security = require('security-middleware')
     , inMemoryStore = require('security-middleware/lib/security.js').inMemoryStore;
@@ -55,3 +55,11 @@ Using It
       }));
       ...
     });
+
+### Use inMemoryStore
+
+### Define a custom Store
+
+### Define an Access Control rule
+
+### Subject api
