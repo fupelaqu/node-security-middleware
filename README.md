@@ -39,8 +39,8 @@ Using It
         logoutUrl : '/logout', // url used by the application to sign out - `/logout` by default
         acl : [ // array of Access Controls to apply per url
                {
-                   url : '/admin', // web resource (s) on which this access control will be applied
-                   methods : 'GET, POST', // HTTP method (s) for which this access control will be applied
+                   url : '/admin', // web resource (s) on which this access control will be applied - `/*` if none specified
+                   methods : 'GET, POST', // HTTP method (s) for which this access control will be applied (GET, POST, PUT, DELETE or * for ALL) - `*` by default
                    authentication : 'BASIC', // authentication type - FORM or BASIC
                    rules : '(([role=user] && [permission=admin]) || [role=admin])' // access control rules to check
                },
@@ -48,31 +48,8 @@ Using It
                    url : '/products/list',
                    methods : 'GET',
                    authentication : 'FORM',
+                   // a rule can be based on query parameter (s) which will be valued at runtime (eg {idCompany})
                    rules : '(([role=user] && [permission=products:company_{idCompany}:list]) || [role=admin])'
-               },
-               {
-                   url : '/products',
-                   methods : 'GET',
-                   authentication : 'FORM',
-                   rules : '(([role=user] && [permission=products:company_{idCompany}:show:product_{idProduct}]) || [role=admin])'
-               },
-               {
-                   url : '/products',
-                   methods : 'PUT',
-                   authentication : 'FORM',
-                   rules : '(([role=user] && [permission=products:company_{idCompany}:create]) || [role=admin])'
-               },
-               {
-                   url : '/products',
-                   methods : 'POST',
-                   authentication : 'FORM',
-                   rules : '(([role=user] && [permission=products:company_{idCompany}:update]) || [role=admin])'
-               },
-               {
-                   url : '/products',
-                   methods : 'DELETE',
-                   authentication : 'FORM',
-                   rules : '(([role=user] && [permission=products:company_{idCompany}:delete]) || [role=admin])'
                }
         ]
       }));
