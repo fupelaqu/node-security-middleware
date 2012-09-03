@@ -35,7 +35,7 @@ Using It
         usernameParam : 'username', // name of the username parameter which will be used during form authentication
         passwordParam : 'password', // name of the password parameter which will be used during form authentication
         logoutUrl : '/logout', // url used by the application to sign out - `/logout` by default
-        acl : [ // array of Access Controls to perform per url
+        acl : [ // array of Access Controls to apply per url
                {
                    url : '/admin', // web resource (s) on which this access control will be applied
                    methods : 'GET, POST', // HTTP method (s) for which this access control will be applied
