@@ -19,7 +19,8 @@ Using It
 
 ### Configure the middleware within express
 
-    var security = require('security-middleware');
+    var security = require('security-middleware')
+    , inMemoryStore = require('security-middleware/lib/security.js').inMemoryStore;
 
     var app = express();
 
@@ -28,7 +29,7 @@ Using It
       app.use(security({ 
         debug : false, // for debug purpose
         realmName : 'Express-security', // realm name
-        store : store, // store which will be used to retrieve user information - inMemoryStore by default
+        store : inMemoryStore, // store which will be used to retrieve user information - inMemoryStore by default if none specified
         rememberMe : true, // whether a cookie will be set after authentication or not - false by default
         secure : true, // whether to use secured cookies or not - false by default
         credentialsMatcher: 'sha256', // a credentialsMatcher must be provided to check if the provided token credentials match the stored account credentials using the encrypted algoithm specified
