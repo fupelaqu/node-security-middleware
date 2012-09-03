@@ -19,7 +19,7 @@ Using It
 
 ### Configure the middleware within express
 
-    var security = require('middleware-security');
+    var security = require('security-middleware');
 
     var app = express();
 
