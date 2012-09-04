@@ -59,6 +59,44 @@ Using It
 
 ```
 
+### Use FORM authentication within express
+
+Whenever an access control applies to an unauthenticated or unauthorized user, the client is automatically redirected to the login url defined for the security middleware.
+
+The login form should include `usernameParam` and `passwordParam` as defined for the security middleware.
+
+```javascript
+app.get('/login', function(req, res){
+  res.render('login', { username: req.param('username') });
+});
+```
+
+The login form may also include a `redirect` input so as to automatically redirect the client to the uri initially requested after authentication completion.
+
+```javascript
+app.get('/login', function(req, res){
+  res.render('login', { username: req.param('username'), redirect : req.param('redirect') });
+});
+```
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Login</h1>
+    <form method="post">
+      <input type="text" name="username" placeholder="Type your login" autofocus required<% if (username) { %> value="<%= username %>"<% } %>>
+      <input type="password" name="password" placeholder="Type your password" required>
+      <input type="hidden" name="redirect"<% if (redirect) { %> value="<%= redirect %>"<% } %>>
+      <input type="submit">
+    </form>
+  </body>
+</html>
+```
+
 ### Use inMemoryStore
 
 The inMemoryStore should not be used in a production environment. It may nevertheless be useful during the development phase.
