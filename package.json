@@ -5,7 +5,7 @@
   },
   "name": "security-middleware",
   "description": "security middleware for connect/express.",
-  "version": "0.0.2rc4",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "git://github.com/fupelaqu/node-security-middleware.git"
@@ -26,6 +26,6 @@
   "engines": {
     "node": "0.8.x"
   },
-  "_id": "security-middleware@0.0.1",
+  "_id": "security-middleware@0.0.2",
   "_from": "security-middleware@*"
 }
