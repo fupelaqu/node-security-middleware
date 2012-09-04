@@ -56,6 +56,7 @@ Using It
       }));
       ...
     });
+
 ```
 
 ### Use inMemoryStore
@@ -92,6 +93,7 @@ inMemoryStore.storeAccount({
     roles : [ 'user', 'admin' ],
     privileges : []
 });
+
 ```
 
 ### Define a custom Store
@@ -112,39 +114,39 @@ Store.prototype.lookup = function(username) {
 };
 
 /**
- * Returns the roles granted to the user mapped to this username as a set of strings
+ * Returns the roles granted to the user mapped to this username as an array of string
  * 
  * @param username
- * @returns the roles granted to the user mapped to this username as a set of strings
+ * @returns the roles granted to the user mapped to this username as an array of string
  */
 Store.prototype.loadUserRoles = function(username) {
     ...
 };
 
 /**
- * Returns the privileges granted to the user mapped to this username as a set of strings
+ * Returns the privileges granted to the user mapped to this username as an array of string
  * 
  * @param username
- * @returns the privileges granted to the user mapped to this username as a set of strings
+ * @returns the privileges granted to the user mapped to this username as an array of string
  */
 Store.prototype.loadUserPrivileges = function(username) {
     ...
 };
 
 /**
- * Returns the privileges granted to the role mapped to this role name as a set of strings
+ * Returns the privileges granted to the role mapped to this role name as an array of string
  * 
- * @param username
- * @returns the privileges granted to the role mapped to this role name as a set of strings
+ * @param roleName
+ * @returns the privileges granted to the role mapped to this role name as an array of string
  */
 Store.prototype.loadRolePrivileges = function(roleName) {
     ...
 };
 
-
 ```
 
-
 ### Define an Access Control rule
+
+
 
 ### Subject api
