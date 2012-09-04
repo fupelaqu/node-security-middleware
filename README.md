@@ -60,6 +60,40 @@ Using It
 
 ### Use inMemoryStore
 
+The inMemoryStore should not be used in a production environment. It may nevertheless be useful during the development phase.
+
+It allows to save in memory both users and roles as in the example below.
+
+```javascript
+var inMemoryStore = require('security-middleware/lib/security.js').inMemoryStore
+, credentialsMatcher = require('security-middleware/lib/security.js').sha256CredentialsMatcher 
+, encryptedPassword = credentialsMatcher.encrypt('changeit');
+
+inMemoryStore.storeRole({
+    name : 'user', // must be unique
+    privileges : [] // may be empty or null
+});
+
+inMemoryStore.storeRole({
+    name : 'admin',
+    privileges : [ 'admin:*' ]
+});
+
+inMemoryStore.storeAccount({
+    username : 'user', // must be unique
+    password : encryptedPassword, // must be encrypted using the same encryption algorithm which will be used by the security middleware
+    roles : ['user'], // set of roles granted to the user
+    privileges : [ 'products:company_1:list', 'products:company_1:show:*' ] // set of privileges granted to the user
+});
+
+inMemoryStore.storeAccount({
+    username : 'admin',
+    password : encryptedPassword,
+    roles : [ 'user', 'admin' ],
+    privileges : []
+});
+```
+
 ### Define a custom Store
 
 ### Define an Access Control rule
