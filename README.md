@@ -273,7 +273,13 @@ will apply to :
 
 Access Control rules are based on a set of role (s) and/or permission (s) which must have been granted to the authenticated user in order to authorize the latter to access the requested web ressource.
 
-They may use logical operators.
+A required role is defined as follow :
+
+    [role=roleName]
+
+A required permission is defined as follow :
+
+    [permission=permissionRule]
 
 It is also possible to specify permissions based on request parameters that will be evaluated at runtime.
 
@@ -283,7 +289,7 @@ A request parameter `parmaterName` may be added using the following syntax :
 
 The following permission
 
-    products:company_{idCompany}:list
+    [permission=products:company_{idCompany}:list]
 
 that applies to
 
@@ -292,6 +298,8 @@ that applies to
 will be evaluated at runtime as below :
 
     products:company_1:list
+
+Finally, Access Control rules may use logical operators.
 
 For instance, for the following request,
 
