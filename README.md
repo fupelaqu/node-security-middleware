@@ -323,9 +323,17 @@ The role `user` has been granted to the authenticated user `and` one of the foll
 
 ### Subject api
 
-An instance of Subject is added to every request.
+An instance of Subject is added to all incoming requests and can be accessed as in the example below :
 
-The latter defines the api specified below :
+```javascript
+app.get('/products/list', function(req, res){
+    var subject = req.subject;
+    ...
+});
+
+```
+
+Subject defines the api described below :
 
 ```javascript
 /**
