@@ -187,13 +187,15 @@ Store.prototype.loadRolePrivileges = function(roleName) {
 
 #### Define an Access Control mapping
 
-An Access Control rule is looked up for every client request based on the url requested as well as the http method.
+An Access Control mapping is looked up for every client request based on the url requested as well as the http method.
 
-For instance, for the following request a matching will be looked up as follow :
+For instance, for the following request,
 
     GET /products/1/list
 
-AccessControl contains `GET` or `*` method and has been defined for one of the following url :
+ a matching will be looked up as follow :
+ 
+ AccessControl contains `GET` or `*` method and has been defined for one of the following url :
 
     /products/1/list
     /products/1/list/* 
