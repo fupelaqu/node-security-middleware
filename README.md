@@ -322,3 +322,68 @@ The role `user` has been granted to the authenticated user `and` one of the foll
 `or` the role `admin` has been granted to the authenticated user
 
 ### Subject api
+
+An instance of Subject is added to every request.
+
+The latter defines the api specified below :
+
+```javascript
+/**
+ * Returns this Subject's uniquely-identifying principal, or null 
+ * if this Subject doesn't yet have account data associated with it
+ */
+Subject.prototype.getPrincipal = function(){
+...
+}
+/**
+ * Returns true if this Subject has the specified role, false otherwise.
+ */
+Subject.prototype.hasRole = function(roleName){
+...
+}
+/**
+ * Returns true if this Subject has all of the specified roles, false otherwise.
+ */
+Subject.prototype.hasAllRoles = function(roles){
+...
+};
+/**
+ * Returns true if the Subject is permitted to perform an action or access a 
+ * resource summarized by the specified permission string.
+ */
+Subject.prototype.isPermitted = function(permission) {
+...
+};
+/**
+ * Returns true if the Subject implies all of the specified permission strings.
+ */
+Subject.prototype.isPermittedAll = function(permissions) {
+...
+};
+/**
+ * Returns true if this Subject/user has proven their identity during their current session
+ * by providing valid credentials matching those known to the system, false otherwise.
+ */
+Subject.prototype.isAuthenticated = function(){
+...
+};
+/**
+ * Performs a login attempt for this Subject/user. If unsuccessful, an error is thrown.
+ * If successful, the account data associated with the submitted principals/credentials 
+ * will be associated with this Subject and the method will return quietly.
+ * 
+ * Upon returninq quietly, this Subject instance can be considered authenticated 
+ * and getPrincipal() will be non-null and isAuthenticated() will return true.
+ */
+Subject.prototype.login = function(token){
+...
+};
+/**
+ * Logs out this Subject and invalidates and/or removes any associated entities 
+ * and authorization data.
+ */
+Subject.prototype.logout = function(){
+...
+};
+
+```
