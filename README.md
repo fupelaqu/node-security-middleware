@@ -32,10 +32,10 @@ Using It
         store : inMemoryStore, // store which will be used to retrieve user information - inMemoryStore by default if none specified
         rememberMe : true, // whether a cookie will be set after authentication or not - false by default
         secure : true, // whether to use secured cookies or not - false by default
-        credentialsMatcher: 'sha256', // a credentialsMatcher must be provided to check if the provided token credentials match the stored account credentials using the encrypted algoithm specified
+        credentialsMatcher: 'sha256', // a credentialsMatcher must be provided to check if the provided token credentials match the stored account credentials using the encryption algorithm specified
         loginUrl : '/login', // url used by the application to sign in - `/login` by default
-        usernameParam : 'username', // name of the username parameter which will be used during form authentication
-        passwordParam : 'password', // name of the password parameter which will be used during form authentication
+        usernameParam : 'username', // name of the username parameter which will be used during form authentication - `username` by default
+        passwordParam : 'password', // name of the password parameter which will be used during form authentication - `password` by default
         logoutUrl : '/logout', // url used by the application to sign out - `/logout` by default
         acl : [ // array of Access Controls to apply per url
                {
