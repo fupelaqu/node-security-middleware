@@ -61,7 +61,7 @@ Using It
 
 ### Use FORM authentication within express
 
-Whenever an access control applies to an unauthenticated or unauthorized user, the client is automatically redirected to the login url defined for the security middleware.
+Whenever an access control applies to an unauthenticated or unauthorized user, the client is automatically redirected to the `loginUrl` defined for the security middleware.
 
 The login form should include `usernameParam` and `passwordParam` as defined for the security middleware.
 
@@ -193,9 +193,9 @@ For instance, for the following request,
 
     GET /products/1/list
 
- a matching will be looked up as follow :
+a matching will be looked up as follow :
  
- AccessControl contains `GET` or `*` method and has been defined for one of the following url :
+AccessControl contains `GET` or `*` method and has been defined for one of the following url :
 
     /products/1/list
     /products/1/list/* 
@@ -269,6 +269,48 @@ will apply to :
 
     DELETE /products
 
-#### Define an Access Control rules
+#### Define Access Control rules
+
+Access Control rules are based on a set of role (s) and/or permission (s) which must have been granted to the authenticated user in order to authorize the latter to access the requested web ressource.
+
+They may use logical operators.
+
+For instance, for the following request,
+
+	GET /products/list?idCompany=1
+
+The following Access Control rules will apply
+
+    '(([role=user] && [permission=products:company_{idCompany}:list]) || [role=admin])'
+
+for which a matching will be looked up as follow :
+
+The role `user` has been granted to the authenticated user `and` one of the following privilege has been granted to the authenticated user :
+
+    products:company_1:list
+    products:company_1:list:*
+    products:company_1:*
+    products:*
+    *
+
+`or` the role `admin` has been granted to the authenticated user
+
+As in the example above, it is possible to specify permissions based on request parameters that will be evaluated at runtime.
+
+A request parameter `parmaterName` may be added using the following syntax :
+
+    {parmaterName}
+
+The following permission
+
+    products:company_{idCompany}:list
+
+that applies to
+
+    GET /products/list?idCompany=1
+
+will be evaluated at runtime as below :
+
+    products:company_1:list
 
 ### Subject api
