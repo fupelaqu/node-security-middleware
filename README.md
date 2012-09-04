@@ -183,8 +183,86 @@ Store.prototype.loadRolePrivileges = function(roleName) {
 
 ```
 
-### Define an Access Control rule
+### Define an Access Control
+
+#### Define an Access Control mapping
+
+An Access Control rule is looked up for every client request based on the url requested as well as the http method.
+
+For instance, for the following request a matching will be looked up as follow :
+
+    GET /products/1/list
+
+AccessControl contains `GET` or `*` method and has been defined for one of the following url :
+
+    /products/1/list
+    /products/1/list/* 
+    /products/1/*
+    /products/*
+    /*
+
+```javascript
+{
+    url : '/products/list',
+    methods : 'GET',
+    authentication : 'FORM',
+    rules : '(([role=user] && [permission=products:company_{idCompany}:list]) || [role=admin])'
+}
+```
+
+will apply to :
+
+    GET /products/list
 
 
+```javascript
+{
+    url : '/products',
+    methods : 'GET',
+    authentication : 'FORM',
+    rules : '(([role=user] && [permission=products:company_{idCompany}:show:product_{idProduct}]) || [role=admin])'
+}
+```
+
+will apply to :
+
+    PUT /products
+
+```javascript
+{
+    url : '/products',
+    methods : 'PUT',
+    authentication : 'FORM',
+    rules : '(([role=user] && [permission=products:company_{idCompany}:create]) || [role=admin])'
+}
+```
+
+will apply to :
+
+    POST /products
+
+```javascript
+{
+    url : '/products',
+    methods : 'POST',
+    authentication : 'FORM',
+    rules : '(([role=user] && [permission=products:company_{idCompany}:update]) || [role=admin])'
+}
+```
+
+will apply to :
+
+    DELETE /products
+
+```javascript
+{
+    url : '/products',
+    methods : 'DELETE',
+    authentication : 'FORM',
+    rules : '(([role=user] && [permission=products:company_{idCompany}:delete]) || [role=admin])'
+}
+``` 
+
+#### Define an Access Control rules
 
 ### Subject api
