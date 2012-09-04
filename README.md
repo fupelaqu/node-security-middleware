@@ -96,6 +96,55 @@ inMemoryStore.storeAccount({
 
 ### Define a custom Store
 
+A custom Store must conform to the interface below :
+
+```javascript
+/**
+ * Returns the user mapped to this username or null
+ * 
+ * If exists, the returned object should include the user's password
+ * 
+ * @param username
+ * @returns the user mapped to this username or null
+ */
+Store.prototype.lookup = function(username) {
+    ...
+};
+
+/**
+ * Returns the roles granted to the user mapped to this username as a set of strings
+ * 
+ * @param username
+ * @returns the roles granted to the user mapped to this username as a set of strings
+ */
+Store.prototype.loadUserRoles = function(username) {
+    ...
+};
+
+/**
+ * Returns the privileges granted to the user mapped to this username as a set of strings
+ * 
+ * @param username
+ * @returns the privileges granted to the user mapped to this username as a set of strings
+ */
+Store.prototype.loadUserPrivileges = function(username) {
+    ...
+};
+
+/**
+ * Returns the privileges granted to the role mapped to this role name as a set of strings
+ * 
+ * @param username
+ * @returns the privileges granted to the role mapped to this role name as a set of strings
+ */
+Store.prototype.loadRolePrivileges = function(roleName) {
+    ...
+};
+
+
+```
+
+
 ### Define an Access Control rule
 
 ### Subject api
