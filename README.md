@@ -61,7 +61,7 @@ Using It
 
 ### Use FORM authentication within express
 
-Whenever an access control applies to an unauthenticated or unauthorized user, the client is automatically redirected to the `loginUrl` defined for the security middleware.
+Whenever an access control using FORM authentication applies to an unauthenticated or unauthorized user, the client is automatically redirected to the `loginUrl` defined for the security middleware.
 
 The login form should include `usernameParam` and `passwordParam` as defined for the security middleware.
 
