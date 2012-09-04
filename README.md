@@ -226,7 +226,7 @@ will apply to :
 
 will apply to :
 
-    PUT /products
+    GET /products
 
 ```javascript
 {
@@ -239,7 +239,7 @@ will apply to :
 
 will apply to :
 
-    POST /products
+    PUT /products
 
 ```javascript
 {
@@ -252,7 +252,7 @@ will apply to :
 
 will apply to :
 
-    DELETE /products
+    POST /products
 
 ```javascript
 {
@@ -262,6 +262,10 @@ will apply to :
     rules : '(([role=user] && [permission=products:company_{idCompany}:delete]) || [role=admin])'
 }
 ``` 
+
+will apply to :
+
+    DELETE /products
 
 #### Define an Access Control rules
 
