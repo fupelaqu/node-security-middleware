@@ -395,3 +395,12 @@ Subject.prototype.logout = function(){
 };
 
 ```
+
+A call to Subject.login requires a token which should be initialized using `UsernamePasswordToken` :
+
+```javascript
+var UsernamePasswordToken = require('security-middleware/lib/security.js').UsernamePasswordToken;
+// user's password should not be encrypted within a token, otherwise the credentials matcher will not work
+subject.login(new UsernamePasswordToken(username, password, rememberMe));
+
+```
