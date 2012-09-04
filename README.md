@@ -19,6 +19,7 @@ Using It
 
 ### Configure security-middleware within express
 
+```javascript
     var security = require('security-middleware')
     , inMemoryStore = require('security-middleware/lib/security.js').inMemoryStore;
 
@@ -55,6 +56,7 @@ Using It
       }));
       ...
     });
+```
 
 ### Use inMemoryStore
 
