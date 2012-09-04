@@ -275,6 +275,24 @@ Access Control rules are based on a set of role (s) and/or permission (s) which 
 
 They may use logical operators.
 
+It is also possible to specify permissions based on request parameters that will be evaluated at runtime.
+
+A request parameter `parmaterName` may be added using the following syntax :
+
+    {parmaterName}
+
+The following permission
+
+    products:company_{idCompany}:list
+
+that applies to
+
+    GET /products/list?idCompany=1
+
+will be evaluated at runtime as below :
+
+    products:company_1:list
+
 For instance, for the following request,
 
 	GET /products/list?idCompany=1
@@ -294,23 +312,5 @@ The role `user` has been granted to the authenticated user `and` one of the foll
     *
 
 `or` the role `admin` has been granted to the authenticated user
-
-As in the example above, it is possible to specify permissions based on request parameters that will be evaluated at runtime.
-
-A request parameter `parmaterName` may be added using the following syntax :
-
-    {parmaterName}
-
-The following permission
-
-    products:company_{idCompany}:list
-
-that applies to
-
-    GET /products/list?idCompany=1
-
-will be evaluated at runtime as below :
-
-    products:company_1:list
 
 ### Subject api
