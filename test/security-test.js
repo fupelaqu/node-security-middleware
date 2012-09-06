@@ -82,16 +82,26 @@ store.storeAccount({
 exports['test security.InMemoryStore'] = function(beforeExit, assert) {
     assert.equal(true, utils.isDefined(store));
 
-    var user = store.lookup('user');
-    assert.equal(true, utils.isDefined(user));
-    assert.equal(true, utils.isEqual(userRoles, store.loadUserRoles('user')));
+    store.lookup('user', function(err, user){
+        assert.equal(true, utils.isDefined(user));
+    });
 
-    var admin = store.lookup('admin');
-    assert.equal(true, utils.isDefined(admin));
-    assert.equal(true, utils.isEqual(adminRoles, store.loadUserRoles('admin')));
+    store.loadUserRoles('user', function(err, roles){
+        assert.equal(true, utils.isEqual(userRoles, roles));
+    });
 
-    assert.equal(true, utils.isEqual(adminRolePrivileges, store
-            .loadRolePrivileges('admin')));
+    store.lookup('admin', function(err, admin){
+        assert.equal(true, utils.isDefined(admin));
+    });
+
+    store.loadUserRoles('admin', function(err, roles){
+        assert.equal(true, utils.isEqual(adminRoles, roles));
+    });
+
+    store.loadRolePrivileges('admin', function(err, privileges){
+        assert.equal(true, utils.isEqual(adminRolePrivileges, privileges));
+    });
+
 };
 
 var realmName = 'Security';
@@ -112,24 +122,43 @@ exports['test security.Realm'] = function(beforeExit, assert) {
 
     assert.equal(security.sha256CredentialsMatcher, realm.credentialsMatcher);
 
-    var account = realm.authenticate(token);
-    assert.equal(true, utils.isDefined(account));
+    realm.authenticate(token, function(err, account){
+        assert.equal(true, utils.isDefined(account));
+        assert.equal(true, utils.isEqual(principal, account.principal));
+    });
 
-    assert.equal(true, utils.isEqual(principal, account.principal));
+    realm.hasRole(principal, 'user', function(err, value){
+        assert.equal(true, value);
+    });
+    realm.hasRole(principal, 'admin', function(err, value){
+        assert.equal(true, value);
+    });
+    realm.hasRole(principal, 'dummy', function(err, value){
+        assert.equal(false, value);
+    });
 
-    assert.equal(true, realm.hasRole(principal, 'user'));
-    assert.equal(true, realm.hasRole(principal, 'admin'));
-    assert.equal(false, realm.hasRole(principal, 'dummy'));
+    realm.hasAllRoles(principal, [ 'admin', 'user' ], function(err, value){
+        assert.equal(true, value);
+    });
+    realm.hasAllRoles(principal, [ 'admin', 'user', 'dummy' ], function(err, value){
+        assert.equal(false, value);
+    });
 
-    assert.equal(true, realm.hasAllRoles(principal, [ 'admin', 'user' ]));
-    assert.equal(false, realm.hasAllRoles(principal,
-            [ 'admin', 'user', 'dummy' ]));
-
-    assert.equal(true, realm.isPermitted(principal, 'admin:user:add'));
-    assert.equal(true, realm.isPermitted(principal, 'admin:user:*'));
-    assert.equal(true, realm.isPermitted(principal, 'admin:*'));
-    assert.equal(false, realm.isPermitted(principal, 'dummy'));
-    assert.equal(false, realm.isPermitted(principal, '*'));
+    realm.isPermitted(principal, 'admin:user:add', function(err, value){
+        assert.equal(true, value);
+    });
+    realm.isPermitted(principal, 'admin:user:*', function(err, value){
+        assert.equal(true, value);
+    });
+    realm.isPermitted(principal, 'admin:*', function(err, value){
+        assert.equal(true, value);
+    });
+    realm.isPermitted(principal, 'dummy', function(err, value){
+        assert.equal(false, value);
+    });
+    realm.isPermitted(principal, '*', function(err, value){
+        assert.equal(false, value);
+    });
 };
 
 exports['test security.AccessControlList'] = function(beforeExit, assert) {
@@ -187,27 +216,41 @@ exports['test security.AccessControlList'] = function(beforeExit, assert) {
 
     var subject = new security.Subject(realm, req, null, false);
     req.subject = subject;
-    subject.login(token);
+    subject.login(token, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+    });
 
     var accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     req['url'] = '/products/list?idCompany=1';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     req['url'] = '/products?idCompany=1&idProduct=1';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     req['url'] = '/products?idCompany=1';
     req['method'] = 'PUT';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     req['method'] = 'POST';
     req['body'] = {
@@ -215,12 +258,18 @@ exports['test security.AccessControlList'] = function(beforeExit, assert) {
     };
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     req['method'] = 'DELETE';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     subject.logout();
 
@@ -236,23 +285,35 @@ exports['test security.AccessControlList'] = function(beforeExit, assert) {
 
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(false, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(false, value);
+    });
 
     req['url'] = '/products/list?idCompany=1';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     req['url'] = '/products?idCompany=1&idProduct=1';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(true, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(true, value);
+    });
 
     req['url'] = '/products?idCompany=1';
     req['method'] = 'PUT';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(false, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(false, value);
+    });
 
     req['method'] = 'POST';
     req['body'] = {
@@ -260,10 +321,16 @@ exports['test security.AccessControlList'] = function(beforeExit, assert) {
     };
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(false, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(false, value);
+    });
 
     req['method'] = 'DELETE';
     accessControl = acl.lookup(req);
     assert.equal(true, utils.isDefined(accessControl));
-    assert.equal(false, accessControl.check(req));
+    accessControl.check(req, function(err, value){
+        assert.equal(true, utils.isUndefined(err));
+        assert.equal(false, value);
+    });
 };

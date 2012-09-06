@@ -64,7 +64,7 @@ app.configure(function(){
     }));
 
     app.use(security({ 
-        debug : false,
+        debug : true,
         realmName : 'Express-security',
         store : store,
         rememberMe : true,

@@ -132,3 +132,70 @@ exports['test utils#every'] = function(beforeExit, assert) {
         return false;
     }));
 };
+
+exports['test utils#forEachAsync'] = function(beforeExit, assert) {
+    utils.forEachAsync([ '1', '2', '3', '4', '5', '6' ], function(next, arg) {
+        var delay = Math.floor(Math.random() * 5 + 1) * 100; // random ms
+        console.log('forEachAsync1 with \''+arg+'\', return in ' + delay + 'ms');
+        var ret = utils.isEqual('5', arg) ? false : arg;
+        setTimeout(function() {
+            next(ret);
+        }, delay);
+    }, function(value) {
+        assert.equal(false, value);
+    });
+    utils.forEachAsync([ '1', '2', '3', '4', '5', '6' ], function(next, arg) {
+        var delay = Math.floor(Math.random() * 5 + 1) * 100; // random ms
+        console.log('forEachAsync2 with \''+arg+'\', return in ' + delay + 'ms');
+        setTimeout(function() {
+            next(arg);
+        }, delay);
+    }, function(value) {
+        assert.equal('6', value);
+    });
+};
+
+exports['test utils#everyAsync'] = function(beforeExit, assert) {
+    utils.everyAsync([ '1', '2', '3', '4', '5', '6' ], function(next, arg) {
+        var delay = Math.floor(Math.random() * 5 + 1) * 100; // random ms
+        console.log('everyAsync1 with \''+arg+'\', return in ' + delay + 'ms');
+        var ret = utils.isEqual('5', arg) ? false : true;
+        setTimeout(function() {
+            next(ret);
+        }, delay);
+    }, function(value) {
+        assert.equal(false, value);
+    });
+    utils.everyAsync([ '1', '2', '3', '4', '5', '6' ], function(next, arg) {
+        var delay = Math.floor(Math.random() * 5 + 1) * 100; // random ms
+        console.log('everyAsync2 with \''+arg+'\', return in ' + delay + 'ms');
+        setTimeout(function() {
+            next(true);
+        }, delay);
+    }, function(value) {
+        assert.equal(true, value);
+    });
+};
+
+exports['test utils#someAsync'] = function(beforeExit, assert) {
+    utils.someAsync([ '1', '2', '3', '4', '5', '6' ], function(next, arg) {
+        var delay = Math.floor(Math.random() * 5 + 1) * 100; // random ms
+        console.log('someAsync1 with \''+arg+'\', return in ' + delay + 'ms');
+        var ret = utils.isEqual('a', arg);
+        setTimeout(function() {
+            next(ret);
+        }, delay);
+    }, function(value) {
+        assert.equal(false, value);
+    });
+    utils.someAsync([ '1', '2', '3', '4', '5', '6' ], function(next, arg) {
+        var delay = Math.floor(Math.random() * 5 + 1) * 100; // random ms
+        console.log('someAsync2 with \''+arg+'\', return in ' + delay + 'ms');
+        var ret = utils.isEqual('5', arg);
+        setTimeout(function() {
+            next(ret);
+        }, delay);
+    }, function(value) {
+        assert.equal(true, value);
+    });
+};
