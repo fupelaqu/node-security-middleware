@@ -40,88 +40,83 @@ var userSchema = new Schema(
 
 mongoose.model('User', userSchema);
 
-conn.once('open', function () {
+var Store = function(){
+    var self = this;
+    conn.once('open', function () {
+        var Role = conn.model('Role');
+        self.Role = Role;
+        utils.forEach(RoleTypes, function(role){
+            Role.findOne({
+                name : role
+            }, 'name', {}, function(err, doc){
+                if(err){
+                    console.error(err);
+                }
+                else if(!doc){
+                    var _role = new Role({
+                        name : role,
+                        privileges : 'admin' === role ? 'admin:*' : ''
+                    });
+                    _role.save(function(err){
+                        if(err){
+                            console.error(err);
+                        }
+                    });
+                }
+                else{
+                    console.log('Role ' + doc.name + ' already exists');
+                }
+            });
+        });
 
-    var Role = conn.model('Role');
-    utils.forEach(RoleTypes, function(role){
-        Role.findOne({
-            name : role
-        }, 'name', {}, function(err, doc){
+        var User = conn.model('User');
+        self.User = User;
+        User.findOne({
+            login:'admin'
+        }, 'login', {}, function(err, doc){
             if(err){
                 console.error(err);
             }
             else if(!doc){
-                var _role = new Role({
-                    name : role,
-                    privileges : 'admin' === role ? 'admin:*' : ''
+                var _account = new User({
+                    login : 'admin',
+                    password : encryptedPassword,
+                    roles : ['user', 'admin']
                 });
-                _role.save(function(err){
+                _account.save(function(err){
                     if(err){
                         console.error(err);
                     }
                 });
             }
             else{
-                console.log('Role ' + doc.name + ' already exists');
+                console.log('User admin already exists');
             }
         });
-    });
+        User.findOne({
+            login:'user'
+        }, 'login', {}, function(err, doc){
+            if(err){
+                console.error(err);
+            }
+            else if(!doc){
+                var _account = new User({
+                    login : 'user',
+                    password : encryptedPassword,
+                    roles : ['user'],
+                    privileges : [ 'products:company_1:list', 'products:company_1:show' ]
+                });
+                _account.save(function(err){
+                    if(err){
+                        console.error(err);
+                    }
+                });
+            }
+            else{
+                console.log('User user already exists');
+            }
+        });
 
-    var User = conn.model('User');
-    User.findOne({
-        login:'admin'
-    }, 'login', {}, function(err, doc){
-        if(err){
-            console.error(err);
-        }
-        else if(!doc){
-            var _account = new User({
-                login : 'admin',
-                password : encryptedPassword,
-                roles : ['user', 'admin']
-            });
-            _account.save(function(err){
-                if(err){
-                    console.error(err);
-                }
-            });
-        }
-        else{
-            console.log('User admin already exists');
-        }
-    });
-    User.findOne({
-        login:'user'
-    }, 'login', {}, function(err, doc){
-        if(err){
-            console.error(err);
-        }
-        else if(!doc){
-            var _account = new User({
-                login : 'user',
-                password : encryptedPassword,
-                roles : ['user'],
-                privileges : [ 'products:company_1:list', 'products:company_1:show' ]
-            });
-            _account.save(function(err){
-                if(err){
-                    console.error(err);
-                }
-            });
-        }
-        else{
-            console.log('User user already exists');
-        }
-    });
-
-    console.log('db connection opened');
-});
-
-var Store = function(){
-    var self = this;
-    conn.on('open', function () {
-        self.Role = conn.model('Role');
-        self.User = conn.model('User');
         console.log('Store initialized');
     });
 };
@@ -222,4 +217,5 @@ Store.prototype.loadRolePrivileges = function(roleName, callback) {
     });
 };
 
-exports.Store = Store;
+var store = new Store();
+exports.store = store;

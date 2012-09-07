@@ -5,9 +5,7 @@ var express = require('express')
 , MemoryStore = require('connect/lib/middleware/session/memory')
 
 , security = require('../lib/middleware.js')
-, Store = require('./lib/stores/mongoose.js').Store;
-
-var store = new Store();
+, store = require('./lib/stores/mongoose.js').store;
 
 var app = express();
 
@@ -52,7 +50,7 @@ app.configure(function(){
                    url : '/products',
                    methods : 'GET',
                    authentication : 'FORM',
-                   rules : '(([role=user] && [permission=products:company_{idCompany}:show:product_{idProduct}]) || [role=admin])'
+                   rules : '(([role=user] && [permission=products:company_{idCompany}:show]) || [role=admin])'
                },
                {
                    url : '/products',
