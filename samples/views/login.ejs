@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Login</h1>
+    <form method="post">
+      <input type="text" name="username" placeholder="Type your login" autofocus required<% if (username) { %> value="<%= username %>"<% } %>>
+      <input type="password" name="password" placeholder="Type your password" required>
+      <input type="hidden" name="redirect"<% if (redirect) { %> value="<%= redirect %>"<% } %>>
+      <input type="submit">
+    </form>
+  </body>
+</html>
