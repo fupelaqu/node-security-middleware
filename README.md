@@ -147,8 +147,8 @@ A custom Store must conform to the interface below :
  * If exists, the returned object should include the user's password
  * 
  * @param username
- * @returns the user mapped to this username or null within the callback
- * @throws any error within the callback
+ * @returns the user mapped to this username or null within the provided callback
+ * @throws any error within the provided callback
  */
 Store.prototype.lookup = function(username, callback) {
     ...
@@ -158,8 +158,8 @@ Store.prototype.lookup = function(username, callback) {
  * Returns the roles granted to the user mapped to this username as an array of string
  * 
  * @param username
- * @returns the roles granted to the user mapped to this username as an array of string within the callback
- * @throws any error within the callback
+ * @returns the roles granted to the user mapped to this username as an array of string within the provided callback
+ * @throws any error within the provided callback
  */
 Store.prototype.loadUserRoles = function(username, callback) {
     ...
@@ -169,8 +169,8 @@ Store.prototype.loadUserRoles = function(username, callback) {
  * Returns the privileges granted to the user mapped to this username as an array of string
  * 
  * @param username
- * @returns the privileges granted to the user mapped to this username as an array of string within the callback
- * @throws any error within the callback
+ * @returns the privileges granted to the user mapped to this username as an array of string within the provided callback
+ * @throws any error within the provided callback
  */
 Store.prototype.loadUserPrivileges = function(username, callback) {
     ...
@@ -180,8 +180,8 @@ Store.prototype.loadUserPrivileges = function(username, callback) {
  * Returns the privileges granted to the role mapped to this role name as an array of string
  * 
  * @param roleName
- * @returns the privileges granted to the role mapped to this role name as an array of string within the callback
- * @throws any error within the callback
+ * @returns the privileges granted to the role mapped to this role name as an array of string within the provided callback
+ * @throws any error within the provided callback
  */
 Store.prototype.loadRolePrivileges = function(roleName, callback) {
     ...
@@ -505,39 +505,39 @@ Subject.prototype.getPrincipal = function(){
 ...
 }
 /**
- * Returns true if this Subject has the specified role, false otherwise.
+ * Returns within the provided callback true if this Subject has the specified role, false otherwise.
  */
 Subject.prototype.hasRole = function(roleName, callback){
 ...
 }
 /**
- * Returns true if this Subject has all of the specified roles, false otherwise.
+ * Returns within the provided callback true if this Subject has all of the specified roles, false otherwise.
  */
 Subject.prototype.hasAllRoles = function(roles, callback){
 ...
 };
 /**
- * Returns true if the Subject is permitted to perform an action or access a 
+ * Returns within the provided callback true if the Subject is permitted to perform an action or access a 
  * resource summarized by the specified permission string.
  */
 Subject.prototype.isPermitted = function(permission, callback) {
 ...
 };
 /**
- * Returns true if the Subject implies all of the specified permission strings.
+ * Returns within the provided callback true if the Subject implies all of the specified permission strings.
  */
 Subject.prototype.isPermittedAll = function(permissions, callback) {
 ...
 };
 /**
- * Returns true if this Subject/user has proven their identity during their current session
+ * Returns within the provided callback true if this Subject/user has proven their identity during their current session
  * by providing valid credentials matching those known to the system, false otherwise.
  */
 Subject.prototype.isAuthenticated = function(){
 ...
 };
 /**
- * Performs a login attempt for this Subject/user. If unsuccessful, an error is thrown.
+ * Performs a login attempt for this Subject/user. If unsuccessful, an error is thrown within the provided callback.
  * If successful, the account data associated with the submitted principals/credentials 
  * will be associated with this Subject and the method will return quietly.
  * 
