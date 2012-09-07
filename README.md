@@ -136,6 +136,8 @@ inMemoryStore.storeAccount({
 
 ### Define a custom Store
 
+#### Store interface
+
 A custom Store must conform to the interface below :
 
 ```javascript
@@ -145,9 +147,10 @@ A custom Store must conform to the interface below :
  * If exists, the returned object should include the user's password
  * 
  * @param username
- * @returns the user mapped to this username or null
+ * @returns the user mapped to this username or null within the callback
+ * @throws any error within the callback
  */
-Store.prototype.lookup = function(username) {
+Store.prototype.lookup = function(username, callback) {
     ...
 };
 
@@ -155,9 +158,10 @@ Store.prototype.lookup = function(username) {
  * Returns the roles granted to the user mapped to this username as an array of string
  * 
  * @param username
- * @returns the roles granted to the user mapped to this username as an array of string
+ * @returns the roles granted to the user mapped to this username as an array of string within the callback
+ * @throws any error within the callback
  */
-Store.prototype.loadUserRoles = function(username) {
+Store.prototype.loadUserRoles = function(username, callback) {
     ...
 };
 
@@ -165,9 +169,10 @@ Store.prototype.loadUserRoles = function(username) {
  * Returns the privileges granted to the user mapped to this username as an array of string
  * 
  * @param username
- * @returns the privileges granted to the user mapped to this username as an array of string
+ * @returns the privileges granted to the user mapped to this username as an array of string within the callback
+ * @throws any error within the callback
  */
-Store.prototype.loadUserPrivileges = function(username) {
+Store.prototype.loadUserPrivileges = function(username, callback) {
     ...
 };
 
@@ -175,11 +180,167 @@ Store.prototype.loadUserPrivileges = function(username) {
  * Returns the privileges granted to the role mapped to this role name as an array of string
  * 
  * @param roleName
- * @returns the privileges granted to the role mapped to this role name as an array of string
+ * @returns the privileges granted to the role mapped to this role name as an array of string within the callback
+ * @throws any error within the callback
  */
-Store.prototype.loadRolePrivileges = function(roleName) {
+Store.prototype.loadRolePrivileges = function(roleName, callback) {
     ...
 };
+
+```
+
+#### Mongoose Store sample
+
+```javascript
+var mongoose = require('mongoose')
+, Schema = mongoose.Schema;
+
+var conn = mongoose.createConnection('localhost', 'test');
+
+conn.on('error', console.error.bind(console, 'connection error:'));
+
+var RoleTypes = 'user admin'.split(' ');
+
+var roleSchema = new Schema(
+  {
+      name: { 
+          'type': String, 
+          'enum': RoleTypes,
+          index : true
+      },
+      privileges : [String]
+  }
+);
+
+mongoose.model('Role', roleSchema);
+
+var userSchema = new Schema(
+    { 
+        login: { 
+            'type': String, 
+            index : true
+        }, 
+        password: String, 
+        roles: [{ 
+            'type' : String, 
+            'enum' : RoleTypes 
+        }], 
+        privileges : [String]
+    }
+);
+
+mongoose.model('User', userSchema);
+
+var Store = function(){
+    var self = this;
+    conn.once('open', function () {
+        self.Role = conn.model('Role');
+        self.User = conn.model('User');
+        console.log('Store initialized');
+    });
+};
+
+/**
+ * Returns the user mapped to this username or null
+ * 
+ * If exists, the returned object should include the user's password
+ * 
+ * @param username
+ * @returns the user mapped to this username or null  within the callback
+ * @throws any error within the callback
+ */
+Store.prototype.lookup = function(username, callback) {
+    this.User.findOne({
+        login:username
+    }, 'login password', {}, function(err, doc){
+        if(err){
+            callback(err);
+        }
+        else if(doc){
+            callback(null, {
+                username : doc.login, 
+                password : doc.password
+            });
+        }
+        else{
+            callback();
+        }
+    });
+};
+
+/**
+ * Returns the roles granted to the user mapped to this username as an array of string
+ * 
+ * @param username
+ * @returns the roles granted to the user mapped to this username as an array of string within the callback
+ * @throws any error within the callback
+ */
+Store.prototype.loadUserRoles = function(username, callback) {
+    this.User.findOne({
+        login:username
+    }, 'roles', {}, function(err, doc){
+        if(err){
+            callback(err);
+        }
+        else if(doc){
+            var roles = doc.roles;
+            callback(null, roles);
+        }
+        else{
+            callback();
+        }
+    });
+};
+
+/**
+ * Returns the privileges granted to the user mapped to this username as an array of string
+ * 
+ * @param username
+ * @returns the privileges granted to the user mapped to this username as an array of string within the callback
+ * @throws any error within the callback
+ */
+Store.prototype.loadUserPrivileges = function(username, callback) {
+    this.User.findOne({
+        login:username
+    }, 'privileges', {}, function(err, doc){
+        if(err){
+            callback(err);
+        }
+        else if(doc){
+            var privileges = doc.privileges;
+            callback(null, privileges);
+        }
+        else{
+            callback();
+        }
+    });
+};
+
+/**
+ * Returns the privileges granted to the role mapped to this role name as an array of string
+ * 
+ * @param roleName
+ * @returns the privileges granted to the role mapped to this role name as an array of string within the callback
+ * @throws any error within the callback
+ */
+Store.prototype.loadRolePrivileges = function(roleName, callback) {
+    this.Role.findOne({
+        name : roleName
+    }, 'privileges', {}, function(err, doc){
+        if(err){
+            callback(err);
+        }
+        else if(doc){
+            var privileges = doc.privileges;
+            callback(null, privileges);
+        }
+        else{
+            callback();
+        }
+    });
+};
+
+var store = new Store();
 
 ```
 
@@ -346,26 +507,26 @@ Subject.prototype.getPrincipal = function(){
 /**
  * Returns true if this Subject has the specified role, false otherwise.
  */
-Subject.prototype.hasRole = function(roleName){
+Subject.prototype.hasRole = function(roleName, callback){
 ...
 }
 /**
  * Returns true if this Subject has all of the specified roles, false otherwise.
  */
-Subject.prototype.hasAllRoles = function(roles){
+Subject.prototype.hasAllRoles = function(roles, callback){
 ...
 };
 /**
  * Returns true if the Subject is permitted to perform an action or access a 
  * resource summarized by the specified permission string.
  */
-Subject.prototype.isPermitted = function(permission) {
+Subject.prototype.isPermitted = function(permission, callback) {
 ...
 };
 /**
  * Returns true if the Subject implies all of the specified permission strings.
  */
-Subject.prototype.isPermittedAll = function(permissions) {
+Subject.prototype.isPermittedAll = function(permissions, callback) {
 ...
 };
 /**
@@ -383,7 +544,7 @@ Subject.prototype.isAuthenticated = function(){
  * Upon returninq quietly, this Subject instance can be considered authenticated 
  * and getPrincipal() will be non-null and isAuthenticated() will return true.
  */
-Subject.prototype.login = function(token){
+Subject.prototype.login = function(token, callback){
 ...
 };
 /**
